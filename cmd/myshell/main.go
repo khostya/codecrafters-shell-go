@@ -21,12 +21,21 @@ func exitCMD(command []string) error {
 	return nil
 }
 
-func eval(command []string) error {
+func echoCMD(command []string) (string, error) {
+	if len(command) < 1 {
+		return "", errors.New("no command given")
+	}
+	return strings.Join(command[1:], " "), nil
+}
+
+func eval(command []string) (string, error) {
 	switch command[0] {
 	case "exit":
-		return exitCMD(command)
+		return "", exitCMD(command)
+	case "echo":
+		return echoCMD(command)
 	default:
-		return errors.New("unknown command: " + command[0])
+		return "", errors.New("unknown command: " + command[0])
 	}
 }
 
@@ -39,9 +48,11 @@ func main() {
 			continue
 		}
 
-		err = eval(strings.Split(command[:len(command)-1], " "))
+		s, err := eval(strings.Split(command[:len(command)-1], " "))
 		if err != nil {
 			fmt.Println(command[:len(command)-1] + ": command not found")
+		} else {
+			fmt.Println(s)
 		}
 	}
 }

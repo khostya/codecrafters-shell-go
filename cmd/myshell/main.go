@@ -9,9 +9,27 @@ import (
 	"strings"
 )
 
+const (
+	typeCommand = "type"
+	exitCommand = "exit"
+	echoCommand = "echo"
+)
+
+func typeCMD(command []string) (string, error) {
+	if len(command) <= 1 {
+		return "", errors.New(strings.Join(command, " ") + ": command not found")
+	}
+	switch command[1] {
+	case exitCommand, typeCommand, echoCommand:
+		return fmt.Sprintf("%s is a shell builtin", command[1]), nil
+	default:
+		return "", errors.New(strings.Join(command[1:], " ") + ": not found")
+	}
+}
+
 func exitCMD(command []string) error {
-	if len(command) < 1 {
-		return errors.New("no command given")
+	if len(command) <= 1 {
+		return errors.New(strings.Join(command, " ") + ": command not found")
 	}
 	i, err := strconv.Atoi(command[1])
 	if err != nil {
@@ -23,19 +41,21 @@ func exitCMD(command []string) error {
 
 func echoCMD(command []string) (string, error) {
 	if len(command) < 1 {
-		return "", errors.New("no command given")
+		return "", errors.New(strings.Join(command, " ") + ": command not found")
 	}
 	return strings.Join(command[1:], " "), nil
 }
 
 func eval(command []string) (string, error) {
 	switch command[0] {
-	case "exit":
+	case exitCommand:
 		return "", exitCMD(command)
-	case "echo":
+	case echoCommand:
 		return echoCMD(command)
+	case typeCommand:
+		return typeCMD(command)
 	default:
-		return "", errors.New("unknown command: " + command[0])
+		return "", errors.New(strings.Join(command, " ") + ": command not found")
 	}
 }
 
@@ -50,7 +70,7 @@ func main() {
 
 		s, err := eval(strings.Split(command[:len(command)-1], " "))
 		if err != nil {
-			fmt.Println(command[:len(command)-1] + ": command not found")
+			fmt.Println(err.Error())
 		} else {
 			fmt.Println(s)
 		}

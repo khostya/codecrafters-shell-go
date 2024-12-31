@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/codecrafters-io/shell-starter-go/internal/command"
+	"github.com/codecrafters-io/shell-starter-go/internal/model"
 	"log"
 	"os"
 	"strings"
@@ -25,7 +26,7 @@ func main() {
 		}
 
 		sp := strings.Split(command[:len(command)-1], " ")
-		output := cmd.Eval(sp)
+		output := cmd.Eval(model.NewCommand(sp[0], sp[1:]...))
 		if output.Stdout() != "" {
 			fmt.Fprint(os.Stdout, output.Stdout())
 		}

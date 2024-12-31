@@ -17,17 +17,20 @@ func main() {
 
 	for {
 		fmt.Fprint(os.Stdout, "$ ")
+
 		command, err := bufio.NewReader(os.Stdin).ReadString('\n')
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Error reading input:", err)
 			continue
 		}
 
-		s, err := cmd.Eval(strings.Split(command[:len(command)-1], " "))
-		if err != nil {
-			fmt.Println(err.Error())
-		} else {
-			fmt.Println(s)
+		sp := strings.Split(command[:len(command)-1], " ")
+		output := cmd.Eval(sp)
+		if output.Stdout() != "" {
+			fmt.Fprint(os.Stdout, output.Stdout())
+		}
+		if output.Stderr() != "" {
+			fmt.Fprint(os.Stdout, output.Stderr())
 		}
 	}
 }

@@ -21,6 +21,7 @@ func TestSplit(t *testing.T) {
 		{"echo \"before\\   after\"", []string{"echo", "before\\   after"}},
 		{"echo world\\ \\ \\ \\ \\ \\ script", []string{"echo", "world      script"}},
 		{"echo \\'\\\"world shell\\\"\\'", []string{"echo", "'\"world", "shell\"'"}},
+		{"echo \"world'hello'\\n'example\"", []string{"echo", "world'hello'\\n'example"}},
 	}
 
 	for _, tc := range tests {

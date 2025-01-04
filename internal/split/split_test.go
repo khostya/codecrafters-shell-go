@@ -18,6 +18,9 @@ func TestSplit(t *testing.T) {
 		{"echo \"test hello\"", []string{"echo", "test hello"}},
 		{"echo shell     hello", []string{"echo", "shell", "hello"}},
 		{"echo \"test' hello\"", []string{"echo", "test' hello"}},
+		{"echo \"before\\   after\"", []string{"echo", "before\\   after"}},
+		{"echo world\\ \\ \\ \\ \\ \\ script", []string{"echo", "world      script"}},
+		{"echo \\'\\\"world shell\\\"\\'", []string{"echo", "'\"world", "shell\"'"}},
 	}
 
 	for _, tc := range tests {

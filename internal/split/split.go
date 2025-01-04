@@ -16,6 +16,7 @@ func Split(s string) []string {
 	startIdx := 0
 	isOpen := false
 	current := strings.Builder{}
+	writeSpace := false
 
 	for i, ch := range s {
 		_ = string(ch)
@@ -26,6 +27,15 @@ func Split(s string) []string {
 			if ch == ' ' {
 				continue
 			}
+			if ch == '\\' {
+				continue
+			}
+
+			if (ch == '\'' || ch == '"') && i != 0 && s[i-1] == '\\' {
+				current.WriteRune(ch)
+				continue
+			}
+
 			isOpen = true
 			if ch == '\'' {
 				openCH = single
@@ -37,9 +47,16 @@ func Split(s string) []string {
 			}
 			startIdx = i
 		} else {
-			if ch == ' ' && openCH == opch {
-				isOpen = false
-				res = append(res, current.String())
+			if (ch == ' ' || ch == '\\') && openCH == opch {
+				if ch == '\\' {
+					writeSpace = true
+				} else if writeSpace {
+					writeSpace = false
+					current.WriteRune(' ')
+				} else {
+					isOpen = false
+					res = append(res, current.String())
+				}
 			} else if ch == '\'' && openCH == single {
 				if startIdx != 0 && s[startIdx-1] == '\'' {
 

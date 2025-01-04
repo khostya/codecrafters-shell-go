@@ -9,11 +9,11 @@ func TestSplit(t *testing.T) {
 	}
 
 	tests := []test{
-		{"abc", []string{"abc"}},
-		{"abc '123   123'", []string{"abc", "123   123"}},
-		{"abc \"123   123\"", []string{"abc", "123   123"}},
-		{"abc '123   123''123'", []string{"abc", "123   123123"}},
-		{"abc \"123   123\"\"123\"", []string{"abc", "123   123123"}},
+		{"echo abc", []string{"echo", "abc"}},
+		{"echo abc '123   123'", []string{"echo", "abc", "123   123"}},
+		{"echo abc \"123   123\"", []string{"echo", "abc", "123   123"}},
+		{"echo abc '123   123''123'", []string{"echo", "abc", "123   123123"}},
+		{"echo abc \"123   123\"\"123\"", []string{"echo", "abc", "123   123123"}},
 		{"echo 'test hello'", []string{"echo", "test hello"}},
 		{"echo \"test hello\"", []string{"echo", "test hello"}},
 		{"echo shell     hello", []string{"echo", "shell", "hello"}},
@@ -21,7 +21,7 @@ func TestSplit(t *testing.T) {
 		{"echo \"before\\   after\"", []string{"echo", "before\\   after"}},
 		{"echo world\\ \\ \\ \\ \\ \\ script", []string{"echo", "world      script"}},
 		{"echo \\'\\\"world shell\\\"\\'", []string{"echo", "'\"world", "shell\"'"}},
-		{"echo \"world'hello'\\n'example\"", []string{"echo", "world'hello'\\n'example"}},
+		{`echo "hello'world'\\n'script"`, []string{"echo", `hello'world'\n'script`}},
 	}
 
 	for _, tc := range tests {

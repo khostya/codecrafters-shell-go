@@ -3,95 +3,62 @@ package split
 import "strings"
 
 func Split(s string) []string {
-	res := make([]string, 0)
+	command, argstr, _ := strings.Cut(s, " ")
 
-	const (
-		opch   = "ch"
-		zero   = "zero"
-		single = "'"
-		double = "\""
-	)
-
-	openCH := zero
-	startIdx := 0
-	isOpen := false
-	current := strings.Builder{}
-	writeSpace := false
-
-	for i, ch := range s {
-		_ = string(ch)
-
-		needWrite := false
-
-		if !isOpen {
-			if ch == ' ' {
-				continue
+	var singleQuote bool
+	var doubleQuote bool
+	var backslash bool
+	var arg string
+	var args []string
+	for _, r := range argstr {
+		switch r {
+		case '\'':
+			if backslash && doubleQuote {
+				arg += "\\"
 			}
-			if ch == '\\' {
-				continue
-			}
-
-			if (ch == '\'' || ch == '"') && i != 0 && s[i-1] == '\\' {
-				current.WriteRune(ch)
-				continue
-			}
-
-			isOpen = true
-			if ch == '\'' {
-				openCH = single
-			} else if ch == '"' {
-				openCH = double
+			if backslash || doubleQuote {
+				arg += string(r)
 			} else {
-				openCH = opch
-				needWrite = true
+				singleQuote = !singleQuote
 			}
-			startIdx = i
-		} else {
-			if (ch == ' ' || ch == '\\') && openCH == opch {
-				if ch == '\\' {
-					writeSpace = true
-				} else if writeSpace {
-					writeSpace = false
-					current.WriteRune(' ')
-				} else {
-					isOpen = false
-					res = append(res, current.String())
-				}
-			} else if ch == '\'' && openCH == single {
-				if startIdx != 0 && s[startIdx-1] == '\'' {
-
-				} else if i < len(s)-1 && s[i+1] == '\'' {
-					startIdx = i + 1
-				} else {
-					isOpen = false
-					res = append(res, current.String())
-				}
-			} else if ch == '"' && openCH == double {
-				if startIdx != 0 && s[startIdx-1] == '"' {
-
-				} else if i < len(s)-1 && s[i+1] == '"' {
-					startIdx = i + 1
-				} else {
-					isOpen = false
-					res = append(res, current.String())
-				}
+			backslash = false
+		case '"':
+			if backslash || singleQuote {
+				arg += string(r)
 			} else {
-				needWrite = true
+				doubleQuote = !doubleQuote
 			}
-		}
-
-		if needWrite {
-			current.WriteRune(ch)
-		}
-
-		if !isOpen {
-			openCH = zero
-			current = strings.Builder{}
+			backslash = false
+		case '\\':
+			if backslash || singleQuote {
+				arg += string(r)
+				backslash = false
+			} else {
+				backslash = true
+			}
+		case ' ':
+			if backslash && doubleQuote {
+				arg += "\\"
+			}
+			if backslash || singleQuote || doubleQuote {
+				arg += string(r)
+			} else if arg != "" {
+				args = append(args, arg)
+				arg = ""
+			}
+			backslash = false
+		default:
+			if doubleQuote && backslash {
+				arg += "\\"
+			}
+			arg += string(r)
+			backslash = false
 		}
 	}
 
-	if current.Len() != 0 {
-		res = append(res, current.String())
+	if arg != "" {
+		args = append(args, arg)
 	}
-	return res
+
+	return append([]string{command}, args...)
 }

@@ -9,6 +9,7 @@ func Split(s string) []string {
 		opch   = "ch"
 		zero   = "zero"
 		single = "'"
+		double = "\""
 	)
 
 	openCH := zero
@@ -28,6 +29,8 @@ func Split(s string) []string {
 			isOpen = true
 			if ch == '\'' {
 				openCH = single
+			} else if ch == '"' {
+				openCH = double
 			} else {
 				openCH = opch
 				needWrite = true
@@ -41,6 +44,15 @@ func Split(s string) []string {
 				if startIdx != 0 && s[startIdx-1] == '\'' {
 
 				} else if i < len(s)-1 && s[i+1] == '\'' {
+					startIdx = i + 1
+				} else {
+					isOpen = false
+					res = append(res, current.String())
+				}
+			} else if ch == '"' && openCH == double {
+				if startIdx != 0 && s[startIdx-1] == '"' {
+
+				} else if i < len(s)-1 && s[i+1] == '"' {
 					startIdx = i + 1
 				} else {
 					isOpen = false

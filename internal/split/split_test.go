@@ -11,9 +11,13 @@ func TestSplit(t *testing.T) {
 	tests := []test{
 		{"abc", []string{"abc"}},
 		{"abc '123   123'", []string{"abc", "123   123"}},
+		{"abc \"123   123\"", []string{"abc", "123   123"}},
 		{"abc '123   123''123'", []string{"abc", "123   123123"}},
+		{"abc \"123   123\"\"123\"", []string{"abc", "123   123123"}},
 		{"echo 'test hello'", []string{"echo", "test hello"}},
+		{"echo \"test hello\"", []string{"echo", "test hello"}},
 		{"echo shell     hello", []string{"echo", "shell", "hello"}},
+		{"echo \"test' hello\"", []string{"echo", "test' hello"}},
 	}
 
 	for _, tc := range tests {

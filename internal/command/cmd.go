@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/codecrafters-io/shell-starter-go/internal/model"
 	"github.com/codecrafters-io/shell-starter-go/internal/path"
+	"os"
 )
 
 const (
@@ -16,6 +17,7 @@ const (
 
 type Commands struct {
 	path path.Path
+	home string
 }
 
 func NewCommands() (*Commands, error) {
@@ -23,7 +25,11 @@ func NewCommands() (*Commands, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Commands{env}, nil
+	home := os.Getenv("HOME")
+	if home == "" {
+		return nil, fmt.Errorf("$HOME environment variable not set")
+	}
+	return &Commands{path: env, home: home}, nil
 }
 
 func (c Commands) Eval(command model.Command) model.Output {

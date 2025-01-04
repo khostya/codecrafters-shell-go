@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func (c Commands) CdAbsolutePathCMD(command model.Command) model.Output {
+func (c Commands) cdAbsolutePathCMD(command model.Command) model.Output {
 	err := os.Chdir(command.Args()[0])
 	if err != nil {
 		return model.NewOutput(model.Stderr(noSuchFileOrDirectory(command)), "")
@@ -18,8 +18,14 @@ func (c Commands) cdCMD(command model.Command) model.Output {
 	if command.Args()[0] == "" {
 		return model.Output{}
 	}
-	if command.Args()[0][0] == '/' {
-		return c.CdAbsolutePathCMD(command)
+
+	arg := command.Args()[0]
+	if arg[0] == '~' {
+		arg = c.home + arg[1:]
+	}
+
+	if arg[0] == '/' {
+		return c.cdAbsolutePathCMD(model.NewCommand(command.Name(), arg))
 	}
 
 	out := c.pwdCMD(command)
@@ -31,7 +37,7 @@ func (c Commands) cdCMD(command model.Command) model.Output {
 
 	stack := strings.Split(stdout, string(os.PathSeparator))
 
-	cd := strings.Split(command.Args()[0], string(os.PathSeparator))
+	cd := strings.Split(arg, string(os.PathSeparator))
 	for _, s := range cd {
 		if s == "" {
 			continue
@@ -47,5 +53,5 @@ func (c Commands) cdCMD(command model.Command) model.Output {
 	}
 
 	path := strings.Join(stack, string(os.PathSeparator))
-	return c.CdAbsolutePathCMD(model.NewCommand(cdCommand, path))
+	return c.cdAbsolutePathCMD(model.NewCommand(cdCommand, path))
 }
